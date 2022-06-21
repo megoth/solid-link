@@ -12,6 +12,7 @@ module.exports = (_env: string, argv: Record<string, boolean | number | string>)
 	entry: {
 		background: './src/js/background.ts',
 		options: './src/js/options.ts',
+		'popup/popup': './src/popup/popup.ts',
 	},
 	// tslint:disable-next-line: object-literal-sort-keys
 	module: {
@@ -52,6 +53,14 @@ module.exports = (_env: string, argv: Record<string, boolean | number | string>)
 						ignore: ['*.js', '*.ts'],
 					},
 					to: 'images',
+				},
+				{
+					context: 'src/popup',
+					from: '*',
+					globOptions: {
+						ignore: ['*.ts'],
+					},
+					to: 'popup',
 				},
 				{
 					from: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js',

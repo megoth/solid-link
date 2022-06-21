@@ -1,6 +1,14 @@
+import HttpHeaders = browser.webRequest.HttpHeaders;
+
 const APPLICABLE_PROTOCOLS = ['http:', 'https:'];
 const ICON_ACTIVE = 'images/solid-emblem.svg';
 const TITLE_ACTIVE = 'Open resource with Solid App';
+
+export function isLDPResourceFromResponseHeader(responseHeaders?: HttpHeaders | undefined): boolean {
+	if (!responseHeaders) return false;
+	const linkHeader = responseHeaders.find(({ name }) => name.toLowerCase() === 'link')?.value;
+	return (linkHeader?.split(',').filter((s) => s.match('rel="type') && s.match('http://www.w3.org/ns/ldp#Resource')) || []).length > 0;
+}
 
 /*
 Returns true only if the URL's protocol is in APPLICABLE_PROTOCOLS.

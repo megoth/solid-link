@@ -1,14 +1,16 @@
-import { hideIcon, initializePageAction, showActiveIcon } from './util';
+import { hideIcon, initializePageAction, isLDPResourceFromResponseHeader, showActiveIcon } from './util';
+import { InitMessage, InitResponse, MESSAGE_TYPES } from './interfaces';
 
 const solidLinkNotification = 'solid-link-notification';
 
 const ldpResources: Record<string, boolean> = {};
 
 browser.webNavigation.onCompleted.addListener(
-	(event) => {
+	async (event) => {
 		const isLDPResource = ldpResources[event.url];
 		if (isLDPResource && event.tabId) {
 			showActiveIcon(event.tabId);
+			// await browser.runtime.sendMessage({ isLDPResource: true });
 		} else if (event.tabId) {
 			hideIcon(event.tabId);
 		}
@@ -33,10 +35,8 @@ browser.webRequest.onHeadersReceived.addListener(
 		// 	title: 'Solid Link',
 		// 	type: 'basic',
 		// });
-		const linkHeader = event.responseHeaders!.find(({ name }) => name.toLowerCase() === 'link')?.value;
-		const isLDPResource =
-			(linkHeader?.split(',').filter((s) => s.match('rel="type') && s.match('http://www.w3.org/ns/ldp#Resource')) || []).length > 0;
-		console.log('ON HEADER', event.url, isLDPResource);
+		const isLDPResource = isLDPResourceFromResponseHeader(event.responseHeaders);
+		// console.log('ON HEADER', event.url, isLDPResource);
 		if (isLDPResource) {
 			ldpResources[event.url] = isLDPResource;
 		}
@@ -69,4 +69,15 @@ Each time a tab is updated, reset the page action for that tab.
 */
 browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
 	initializePageAction(tab, !!tab.url && ldpResources[tab.url]);
+});
+
+browser.runtime.onMessage.addListener((request: InitMessage, sender, sendResponse) => {
+	switch (request.msg) {
+		case MESSAGE_TYPES.INIT_MESSAGE:
+			const response: InitResponse = {
+				msg: MESSAGE_TYPES.INIT_RESPONSE,
+				data: { isLDPResource: ldpResources[request.data.url] },
+			};
+			return sendResponse(response);
+	}
 });

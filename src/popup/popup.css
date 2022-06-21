@@ -1,0 +1,11 @@
+html, body {
+  width: 100px;
+}
+
+body {
+	padding: 1em;
+}
+
+.hidden {
+  display: none;
+}

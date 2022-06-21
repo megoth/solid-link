@@ -23,7 +23,8 @@
 	"page_action": {
 		"browser_style": true,
 		"default_icon": "images/solid-emblem.svg",
-		"default_title": "Open resource in Solid App"
+		"default_title": "Open resource in Solid App",
+		"default_popup": "popup/popup.html"
 	},
 	"permissions": [
 		"activeTab",
