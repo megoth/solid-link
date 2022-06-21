@@ -1,0 +1,8 @@
+dist/
+.DS_Store
+node_modules
+.env
+npm-debug.log
+edge/
+BUILDING_WINDOWS.md
+dustplanet.*

@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"declaration": false,
+		"noImplicitAny": true,
+		"noImplicitReturns": false,
+		"strictNullChecks": true,
+		"experimentalDecorators": true,
+		"strictFunctionTypes": true,
+		"noImplicitThis": true,
+		"outDir": "dist/js",
+		"removeComments": true,
+		"target": "ESNext",
+		"lib": ["DOM", "ES2020"],
+		"module": "CommonJS",
+		"moduleResolution": "Node",
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"typeRoots": ["./node_modules/@types"]
+	},
+	"include": ["src/js/*.ts"]
+}

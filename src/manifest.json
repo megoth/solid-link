@@ -1,0 +1,45 @@
+{
+	"name": "Solid Link",
+	"version": "0.0.1",
+	"manifest_version": 2,
+	"minimum_chrome_version": "70",
+	"applications": {
+		"gecko": {
+			"id": "{744e2cc4-e8d5-4ab9-814e-d7dc30a09b3c}",
+			"strict_min_version": "60.0"
+		}
+	},
+	"author": "Arne Hassel",
+	"description": "Connect RDF resources to Solid apps",
+	"background": {
+		"scripts": ["browser-polyfill.min.js", "background.js"],
+		"persistent": true
+	},
+	"options_ui": {
+		"chrome_style": true,
+		"page": "options.html"
+	},
+	"options_page": "options.html",
+	"page_action": {
+		"browser_style": true,
+		"default_icon": "images/solid-emblem.svg",
+		"default_title": "Open resource in Solid App"
+	},
+	"permissions": [
+		"activeTab",
+		"tabs",
+		"webNavigation",
+		"webRequest",
+		"notifications",
+		"storage",
+		"responseHeaders",
+		"<all_urls>"
+	],
+	"icons": {
+		"16": "images/icon16.png",
+		"32": "images/icon32.png",
+		"48": "images/icon48.png",
+		"64": "images/icon64.png",
+		"128": "images/icon128.png"
+	}
+}
