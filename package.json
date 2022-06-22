@@ -57,5 +57,11 @@
 			"postchangelog": "prettier --write CHANGELOG.md"
 		}
 	},
-	"dependencies": {}
+	"dependencies": {
+		"@inrupt/solid-client": "^1.23.1",
+		"@inrupt/solid-client-authn-browser": "^1.12.0",
+		"@inrupt/vocab-common-rdf": "^1.0.5",
+		"@inrupt/vocab-solid": "^1.0.4",
+		"buffer": "^6.0.3"
+	}
 }

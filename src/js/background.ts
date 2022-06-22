@@ -1,5 +1,7 @@
 import { hideIcon, initializePageAction, isLDPResourceFromResponseHeader, showActiveIcon } from './util';
-import { InitMessage, InitResponse, MESSAGE_TYPES } from './interfaces';
+import { BaseMessage, InitFailure, InitMessage, InitResponse, MESSAGE_TYPES } from './interfaces';
+import { getSolidDataset } from '@inrupt/solid-client';
+import { fetch } from '@inrupt/solid-client-authn-browser';
 
 const solidLinkNotification = 'solid-link-notification';
 
@@ -36,7 +38,7 @@ browser.webRequest.onHeadersReceived.addListener(
 		// 	type: 'basic',
 		// });
 		const isLDPResource = isLDPResourceFromResponseHeader(event.responseHeaders);
-		// console.log('ON HEADER', event.url, isLDPResource);
+		// console.log('ON HEADER', event.url, isLDPResource, event);
 		if (isLDPResource) {
 			ldpResources[event.url] = isLDPResource;
 		}
@@ -71,13 +73,25 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
 	initializePageAction(tab, !!tab.url && ldpResources[tab.url]);
 });
 
-browser.runtime.onMessage.addListener((request: InitMessage, sender, sendResponse) => {
+function handleInitMessage(message: InitMessage): BaseMessage {
+	const url = message.data.url;
+	if (!url) {
+		const failure: InitFailure = {
+			msg: MESSAGE_TYPES.INIT_FAILURE,
+			data: { error: 'Invalid URL' },
+		};
+		return failure;
+	}
+	const response: InitResponse = {
+		msg: MESSAGE_TYPES.INIT_RESPONSE,
+		data: { isLDPResource: ldpResources[url] },
+	};
+	return response;
+}
+
+browser.runtime.onMessage.addListener((request: BaseMessage, sender, sendResponse) => {
 	switch (request.msg) {
 		case MESSAGE_TYPES.INIT_MESSAGE:
-			const response: InitResponse = {
-				msg: MESSAGE_TYPES.INIT_RESPONSE,
-				data: { isLDPResource: ldpResources[request.data.url] },
-			};
-			return sendResponse(response);
+			sendResponse(handleInitMessage(request as InitMessage));
 	}
 });
