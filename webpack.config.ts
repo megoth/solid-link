@@ -11,6 +11,7 @@ module.exports = (_env: string, argv: Record<string, boolean | number | string>)
 	devtool: argv.mode === 'production' ? undefined : 'source-map',
 	entry: {
 		background: './src/js/background.ts',
+		'content_scripts/content-script': './src/content_scripts/content-script.ts',
 		options: './src/js/options.ts',
 		'popup/popup': './src/popup/popup.ts',
 	},

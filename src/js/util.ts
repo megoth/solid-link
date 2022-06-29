@@ -40,3 +40,11 @@ export function initializePageAction(tab: browser.tabs.Tab, active: boolean = fa
 		hideIcon(tab.id);
 	}
 }
+
+export async function getActiveTab(url?: string): Promise<browser.tabs.Tab | undefined> {
+	const tabs = await browser.tabs.query({
+		currentWindow: true,
+		active: true,
+	});
+	return url ? tabs.find((tab) => tab.url === url) : tabs.pop();
+}

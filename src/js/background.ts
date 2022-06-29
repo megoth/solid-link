@@ -1,5 +1,5 @@
-import { hideIcon, initializePageAction, isLDPResourceFromResponseHeader, showActiveIcon } from './util';
-import { BaseMessage, InitFailure, InitMessage, InitResponse, MESSAGE_TYPES } from './interfaces';
+import { getActiveTab, hideIcon, initializePageAction, isLDPResourceFromResponseHeader, showActiveIcon } from './util';
+import { BaseMessage, InitFailure, InitMessage, InitResponse, ManifestMessage, MESSAGE_TYPES } from './interfaces';
 import { getSolidDataset } from '@inrupt/solid-client';
 import { fetch } from '@inrupt/solid-client-authn-browser';
 
@@ -10,11 +10,13 @@ const ldpResources: Record<string, boolean> = {};
 browser.webNavigation.onCompleted.addListener(
 	async (event) => {
 		const isLDPResource = ldpResources[event.url];
+		// console.log('onCompleted', isLDPResource, event);
 		if (isLDPResource && event.tabId) {
 			showActiveIcon(event.tabId);
 			// await browser.runtime.sendMessage({ isLDPResource: true });
 		} else if (event.tabId) {
 			hideIcon(event.tabId);
+			await browser.tabs.executeScript({ file: '/content_scripts/content-script.js' });
 		}
 		// browser.notifications.create(solidLinkNotification, {
 		// 	iconUrl: browser.runtime.getURL('images/icon64.png'),
@@ -73,6 +75,13 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
 	initializePageAction(tab, !!tab.url && ldpResources[tab.url]);
 });
 
+async function handleManifestMessage(message: ManifestMessage): Promise<void> {
+	const tab = await getActiveTab(message.data.url);
+	if (!tab) return;
+	showActiveIcon(tab.id!);
+	// console.log('HANDLING MANIFEST MESSAGE', message, tab);
+}
+
 function handleInitMessage(message: InitMessage): BaseMessage {
 	const url = message.data.url;
 	if (!url) {
@@ -84,7 +93,7 @@ function handleInitMessage(message: InitMessage): BaseMessage {
 	}
 	const response: InitResponse = {
 		msg: MESSAGE_TYPES.INIT_RESPONSE,
-		data: { isLDPResource: ldpResources[url] },
+		data: { isLDPResource: ldpResources[url], url },
 	};
 	return response;
 }
@@ -92,6 +101,8 @@ function handleInitMessage(message: InitMessage): BaseMessage {
 browser.runtime.onMessage.addListener((request: BaseMessage, sender, sendResponse) => {
 	switch (request.msg) {
 		case MESSAGE_TYPES.INIT_MESSAGE:
-			sendResponse(handleInitMessage(request as InitMessage));
+			return sendResponse(handleInitMessage(request as InitMessage));
+		case MESSAGE_TYPES.MANIFEST_MESSAGE:
+			return handleManifestMessage(request as ManifestMessage);
 	}
 });
